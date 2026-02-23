@@ -22,6 +22,7 @@ class CalculatorViewModel : ViewModel() {
             is CalculatorAction.Calculate -> CalculatorEngine.calculate(current)
             is CalculatorAction.Delete -> CalculatorEngine.delete(current)
             is CalculatorAction.Clear -> CalculatorEngine.clear(current)
+            is CalculatorAction.ToggleSign -> CalculatorEngine.toggleSign(current)
         }
     }
 }

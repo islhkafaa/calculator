@@ -67,6 +67,16 @@ object CalculatorEngine {
 
     fun clear(state: CalculatorState): CalculatorState = CalculatorState()
 
+    fun toggleSign(state: CalculatorState): CalculatorState {
+        if (state.primaryNumber.isEmpty() || state.primaryNumber == ERROR) return state
+        val toggled = if (state.primaryNumber.startsWith("-")) {
+            state.primaryNumber.removePrefix("-")
+        } else {
+            "-${state.primaryNumber}"
+        }
+        return state.copy(primaryNumber = toggled)
+    }
+
     fun percentage(state: CalculatorState): CalculatorState {
         if (state.primaryNumber.isEmpty() || state.primaryNumber == ERROR) return state
         return try {

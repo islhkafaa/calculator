@@ -13,36 +13,48 @@ import androidx.compose.ui.unit.dp
 import app.calculator.domain.CalculatorAction
 import app.calculator.domain.CalculatorOperation
 
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
+
+data class ButtonData(
+    val symbol: String,
+    val style: ButtonStyle,
+    val action: CalculatorAction,
+    val icon: ImageVector? = null
+)
+
 private val rows = listOf(
     listOf(
-        Triple("AC", ButtonStyle.Action, CalculatorAction.Clear),
-        Triple("+/-", ButtonStyle.Action, CalculatorAction.Clear),
-        Triple("%", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Percent)),
-        Triple("÷", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Divide))
+        ButtonData("AC", ButtonStyle.Action, CalculatorAction.Clear),
+        ButtonData("+/-", ButtonStyle.Action, CalculatorAction.ToggleSign, Icons.Default.Exposure),
+        ButtonData("%", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Percent), Icons.Default.Percent),
+        ButtonData("÷", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Divide))
     ),
     listOf(
-        Triple("7", ButtonStyle.Number, CalculatorAction.EnterNumber(7)),
-        Triple("8", ButtonStyle.Number, CalculatorAction.EnterNumber(8)),
-        Triple("9", ButtonStyle.Number, CalculatorAction.EnterNumber(9)),
-        Triple("×", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Multiply))
+        ButtonData("7", ButtonStyle.Number, CalculatorAction.EnterNumber(7)),
+        ButtonData("8", ButtonStyle.Number, CalculatorAction.EnterNumber(8)),
+        ButtonData("9", ButtonStyle.Number, CalculatorAction.EnterNumber(9)),
+        ButtonData("×", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Multiply), Icons.Default.Close)
     ),
     listOf(
-        Triple("4", ButtonStyle.Number, CalculatorAction.EnterNumber(4)),
-        Triple("5", ButtonStyle.Number, CalculatorAction.EnterNumber(5)),
-        Triple("6", ButtonStyle.Number, CalculatorAction.EnterNumber(6)),
-        Triple("-", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Subtract))
+        ButtonData("4", ButtonStyle.Number, CalculatorAction.EnterNumber(4)),
+        ButtonData("5", ButtonStyle.Number, CalculatorAction.EnterNumber(5)),
+        ButtonData("6", ButtonStyle.Number, CalculatorAction.EnterNumber(6)),
+        ButtonData("-", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Subtract), Icons.Default.Remove)
     ),
     listOf(
-        Triple("1", ButtonStyle.Number, CalculatorAction.EnterNumber(1)),
-        Triple("2", ButtonStyle.Number, CalculatorAction.EnterNumber(2)),
-        Triple("3", ButtonStyle.Number, CalculatorAction.EnterNumber(3)),
-        Triple("+", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Add))
+        ButtonData("1", ButtonStyle.Number, CalculatorAction.EnterNumber(1)),
+        ButtonData("2", ButtonStyle.Number, CalculatorAction.EnterNumber(2)),
+        ButtonData("3", ButtonStyle.Number, CalculatorAction.EnterNumber(3)),
+        ButtonData("+", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Add), Icons.Default.Add)
     ),
     listOf(
-        Triple("←", ButtonStyle.Action, CalculatorAction.Delete),
-        Triple("0", ButtonStyle.Number, CalculatorAction.EnterNumber(0)),
-        Triple(".", ButtonStyle.Number, CalculatorAction.EnterDecimal),
-        Triple("=", ButtonStyle.Primary, CalculatorAction.Calculate)
+        ButtonData("←", ButtonStyle.Action, CalculatorAction.Delete, Icons.AutoMirrored.Filled.Backspace),
+        ButtonData("0", ButtonStyle.Number, CalculatorAction.EnterNumber(0)),
+        ButtonData(".", ButtonStyle.Number, CalculatorAction.EnterDecimal),
+        ButtonData("=", ButtonStyle.Primary, CalculatorAction.Calculate)
     )
 )
 
@@ -60,12 +72,13 @@ fun CalculatorButtonGrid(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                row.forEach { (symbol, style, action) ->
+                row.forEach { button ->
                     CalculatorButton(
-                        symbol = symbol,
-                        style = style,
+                        symbol = button.symbol,
+                        style = button.style,
                         modifier = Modifier.weight(1f),
-                        onClick = { onAction(action) }
+                        icon = button.icon,
+                        onClick = { onAction(button.action) }
                     )
                 }
             }

@@ -7,4 +7,5 @@ sealed class CalculatorAction {
     data object Calculate : CalculatorAction()
     data object Clear : CalculatorAction()
     data object Delete : CalculatorAction()
+    data object ToggleSign : CalculatorAction()
 }

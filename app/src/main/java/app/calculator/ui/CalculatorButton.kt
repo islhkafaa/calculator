@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,21 +21,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.Icon
+
+import androidx.compose.foundation.layout.size
 
 @Composable
 fun CalculatorButton(
     symbol: String,
     style: ButtonStyle,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
     onClick: () -> Unit
 ) {
     var pressed by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     val scale by animateFloatAsState(
         targetValue = if (pressed) 0.88f else 1f,
@@ -77,6 +86,7 @@ fun CalculatorButton(
                 detectTapGestures(
                     onPress = {
                         pressed = true
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         tryAwaitRelease()
                         pressed = false
                         onClick()
@@ -85,12 +95,20 @@ fun CalculatorButton(
             }
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = symbol,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center
-            )
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = symbol,
+                    modifier = Modifier.size(32.dp)
+                )
+            } else {
+                Text(
+                    text = symbol,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
