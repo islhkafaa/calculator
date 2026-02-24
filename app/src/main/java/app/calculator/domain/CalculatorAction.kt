@@ -9,4 +9,6 @@ sealed class CalculatorAction {
     data object ClearEntry : CalculatorAction()
     data object Delete : CalculatorAction()
     data object ToggleSign : CalculatorAction()
+    data object Percent : CalculatorAction()
+    data object SquareRoot : CalculatorAction()
 }

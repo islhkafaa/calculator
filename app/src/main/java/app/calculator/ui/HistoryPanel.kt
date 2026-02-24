@@ -19,26 +19,36 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.calculator.domain.HistoryEntry
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryPanel(
     history: List<HistoryEntry>,
     visible: Boolean,
     onRestore: (HistoryEntry) -> Unit,
     onClear: () -> Unit,
+    onDeleteEntry: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -89,30 +99,66 @@ fun HistoryPanel(
                                 .fillMaxWidth()
                                 .weight(1f, fill = false)
                         ) {
-                            items(history) { entry ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            onRestore(entry)
-                                            onDismiss()
+                            items(history, key = { it.id }) { entry ->
+                                val dismissState = rememberSwipeToDismissBoxState(
+                                    confirmValueChange = {
+                                        if (it == SwipeToDismissBoxValue.EndToStart) {
+                                            onDeleteEntry(entry.id)
+                                            true
+                                        } else false
+                                    }
+                                )
+
+                                SwipeToDismissBox(
+                                    state = dismissState,
+                                    backgroundContent = {
+                                        val color = when (dismissState.dismissDirection) {
+                                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                            else -> Color.Transparent
                                         }
-                                        .padding(horizontal = 24.dp, vertical = 14.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(color)
+                                                .padding(horizontal = 24.dp),
+                                            contentAlignment = Alignment.CenterEnd
+                                        ) {
+                                            if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Delete",
+                                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                                )
+                                            }
+                                        }
+                                    },
+                                    enableDismissFromStartToEnd = false
                                 ) {
-                                    Text(
-                                        text = entry.expression,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 16.sp,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Text(
-                                        text = "= ${entry.result}",
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 18.sp
-                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .clickable {
+                                                onRestore(entry)
+                                                onDismiss()
+                                            }
+                                            .padding(horizontal = 24.dp, vertical = 14.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = entry.expression,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 16.sp,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Text(
+                                            text = "= ${entry.result}",
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 18.sp
+                                        )
+                                    }
                                 }
                                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                             }

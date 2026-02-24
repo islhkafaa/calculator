@@ -26,7 +26,13 @@ data class ButtonData(
     val icon: ImageVector? = null
 )
 
-private val rows = listOf(
+private val rows: List<List<ButtonData?>> = listOf(
+    listOf(
+        ButtonData("^", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Power)),
+        ButtonData("√", ButtonStyle.Operator, CalculatorAction.SquareRoot),
+        null,
+        null
+    ),
     listOf(
         ButtonData("AC", ButtonStyle.Action, CalculatorAction.Clear),
         ButtonData("+/-", ButtonStyle.Action, CalculatorAction.ToggleSign, Icons.Default.Exposure),
@@ -52,9 +58,9 @@ private val rows = listOf(
         ButtonData("+", ButtonStyle.Operator, CalculatorAction.EnterOperation(CalculatorOperation.Add), Icons.Default.Add)
     ),
     listOf(
-        ButtonData("←", ButtonStyle.Action, CalculatorAction.Delete, Icons.AutoMirrored.Filled.Backspace),
         ButtonData("0", ButtonStyle.Number, CalculatorAction.EnterNumber(0)),
         ButtonData(".", ButtonStyle.Number, CalculatorAction.EnterDecimal),
+        ButtonData("←", ButtonStyle.Action, CalculatorAction.Delete, Icons.AutoMirrored.Filled.Backspace),
         ButtonData("=", ButtonStyle.Primary, CalculatorAction.Calculate)
     )
 )
@@ -79,17 +85,21 @@ fun CalculatorButtonGrid(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 row.forEach { button ->
-                    val isClear = button.style == ButtonStyle.Action && (button.symbol == "AC" || button.symbol == "C")
-                    val currentSymbol = if (isClear) clearLabel else button.symbol
-                    val currentAction = if (isClear) clearAction else button.action
+                    if (button != null) {
+                        val isClear = button.style == ButtonStyle.Action && (button.symbol == "AC" || button.symbol == "C")
+                        val currentSymbol = if (isClear) clearLabel else button.symbol
+                        val currentAction = if (isClear) clearAction else button.action
 
-                    CalculatorButton(
-                        symbol = currentSymbol,
-                        style = button.style,
-                        modifier = Modifier.weight(1f),
-                        icon = button.icon,
-                        onClick = { onAction(currentAction) }
-                    )
+                        CalculatorButton(
+                            symbol = currentSymbol,
+                            style = button.style,
+                            modifier = Modifier.weight(1f),
+                            icon = button.icon,
+                            onClick = { onAction(currentAction) }
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
                 }
             }
         }

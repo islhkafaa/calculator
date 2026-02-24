@@ -1,5 +1,17 @@
 package app.calculator.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -57,34 +70,66 @@ fun CalculatorDisplay(
             }
         }
 
-        if (secondaryText.isNotEmpty()) {
+        AnimatedContent(
+            targetState = secondaryText,
+            transitionSpec = {
+                (slideInVertically { height -> height / 2 } + fadeIn())
+                    .togetherWith(slideOutVertically { height -> -height / 2 } + fadeOut())
+                    .using(SizeTransform(clip = false))
+            },
+            label = "secondaryTextAnimation",
+            modifier = Modifier.fillMaxWidth()
+        ) { text ->
+            if (text.isNotEmpty()) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        AnimatedContent(
+            targetState = primaryText,
+            transitionSpec = {
+                val springSpec = spring<IntOffset>(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+                (slideInVertically(animationSpec = springSpec) { height -> height / 3 } + fadeIn())
+                    .togetherWith(slideOutVertically(animationSpec = springSpec) { height -> -height / 3 } + fadeOut())
+                    .using(SizeTransform(clip = false))
+            },
+            label = "primaryTextAnimation",
+            modifier = Modifier.fillMaxWidth()
+        ) { text ->
+            val fontSize = when {
+                text.length > 12 -> 36.sp
+                text.length > 8 -> 48.sp
+                else -> 64.sp
+            }
+
+            val isResult = state.secondaryNumber.isEmpty() && state.operation == null && state.primaryNumber.isNotEmpty()
+            val textColor by animateColorAsState(
+                targetValue = if (isResult) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                label = "textColorAnimation"
+            )
+
             Text(
-                text = secondaryText,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Normal,
+                text = text,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Light,
+                color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.End,
                 modifier = Modifier.fillMaxWidth()
             )
         }
-
-        val fontSize = when {
-            primaryText.length > 12 -> 36.sp
-            primaryText.length > 8 -> 48.sp
-            else -> 64.sp
-        }
-
-        Text(
-            text = primaryText,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Light,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.End,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }

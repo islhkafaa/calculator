@@ -39,12 +39,18 @@ class CalculatorViewModel : ViewModel() {
             is CalculatorAction.Clear -> CalculatorEngine.clear(current)
             is CalculatorAction.ClearEntry -> CalculatorEngine.clearEntry(current)
             is CalculatorAction.ToggleSign -> CalculatorEngine.toggleSign(current)
+            is CalculatorAction.Percent -> CalculatorEngine.percentage(current)
+            is CalculatorAction.SquareRoot -> CalculatorEngine.squareRoot(current)
         }
         _state.value = next
     }
 
     fun restoreEntry(entry: HistoryEntry) {
         _state.value = CalculatorState(primaryNumber = entry.result)
+    }
+
+    fun deleteHistoryEntry(id: String) {
+        _history.value = _history.value.filter { it.id != id }
     }
 
     fun clearHistory() {

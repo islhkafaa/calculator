@@ -117,8 +117,27 @@ object CalculatorEngine {
                     if (b.compareTo(BigDecimal.ZERO) == 0) return state.copy(primaryNumber = ERROR)
                     a.remainder(b, MathContext.DECIMAL128)
                 }
+                CalculatorOperation.Power -> {
+                    try {
+                        a.pow(b.toInt(), MathContext.DECIMAL128)
+                    } catch (e: Exception) {
+                        return state.copy(primaryNumber = ERROR)
+                    }
+                }
+                CalculatorOperation.SquareRoot -> return state
                 null -> return state
             }
+            state.copy(primaryNumber = format(result))
+        } catch (e: Exception) {
+            state.copy(primaryNumber = ERROR)
+        }
+    }
+
+    fun squareRoot(state: CalculatorState): CalculatorState {
+        if (state.primaryNumber.isEmpty() || state.primaryNumber == ERROR) return state
+        return try {
+            val primary = BigDecimal(state.primaryNumber)
+            val result = primary.sqrt(MathContext.DECIMAL128)
             state.copy(primaryNumber = format(result))
         } catch (e: Exception) {
             state.copy(primaryNumber = ERROR)
