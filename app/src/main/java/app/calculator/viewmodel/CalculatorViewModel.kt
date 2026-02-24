@@ -37,6 +37,7 @@ class CalculatorViewModel : ViewModel() {
             }
             is CalculatorAction.Delete -> CalculatorEngine.delete(current)
             is CalculatorAction.Clear -> CalculatorEngine.clear(current)
+            is CalculatorAction.ClearEntry -> CalculatorEngine.clearEntry(current)
             is CalculatorAction.ToggleSign -> CalculatorEngine.toggleSign(current)
         }
         _state.value = next

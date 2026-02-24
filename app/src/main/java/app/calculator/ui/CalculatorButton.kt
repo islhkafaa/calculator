@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import app.calculator.ui.theme.LocalExpressiveShapes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,11 +69,12 @@ fun CalculatorButton(
         ButtonStyle.Primary -> MaterialTheme.colorScheme.onPrimary
     }
 
+    val expressiveShapes = LocalExpressiveShapes.current
     val shape: Shape = when (style) {
-        ButtonStyle.Number -> RoundedCornerShape(28.dp)
-        ButtonStyle.Operator -> RoundedCornerShape(20.dp)
-        ButtonStyle.Action -> RoundedCornerShape(16.dp)
-        ButtonStyle.Primary -> CircleShape
+        ButtonStyle.Number -> expressiveShapes.number
+        ButtonStyle.Operator -> expressiveShapes.operator
+        ButtonStyle.Action -> expressiveShapes.action
+        ButtonStyle.Primary -> expressiveShapes.primary
     }
 
     Surface(

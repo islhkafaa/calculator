@@ -1,5 +1,6 @@
 package app.calculator.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.calculator.viewmodel.CalculatorViewModel
 
@@ -31,7 +33,10 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
         Box(modifier = Modifier.fillMaxSize()) {
             BoxWithConstraints(modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
                 if (maxWidth > maxHeight) {
-                    Row(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         CalculatorDisplay(
                             state = state,
                             onHistoryClick = { showHistory = true },
@@ -41,13 +46,17 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
                         )
                         CalculatorButtonGrid(
                             onAction = viewModel::onInput,
+                            state = state,
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .weight(1f)
                         )
                     }
                 } else {
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         CalculatorDisplay(
                             state = state,
                             onHistoryClick = { showHistory = true },
@@ -57,6 +66,7 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = viewModel()) {
                         )
                         CalculatorButtonGrid(
                             onAction = viewModel::onInput,
+                            state = state,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

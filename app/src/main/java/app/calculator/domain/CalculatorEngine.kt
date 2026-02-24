@@ -67,6 +67,14 @@ object CalculatorEngine {
 
     fun clear(state: CalculatorState): CalculatorState = CalculatorState()
 
+    fun clearEntry(state: CalculatorState): CalculatorState {
+        return if (state.primaryNumber.isNotEmpty()) {
+            state.copy(primaryNumber = "")
+        } else {
+            state
+        }
+    }
+
     fun toggleSign(state: CalculatorState): CalculatorState {
         if (state.primaryNumber.isEmpty() || state.primaryNumber == ERROR) return state
         val toggled = if (state.primaryNumber.startsWith("-")) {
@@ -98,16 +106,16 @@ object CalculatorEngine {
             val a = BigDecimal(state.secondaryNumber)
             val b = BigDecimal(state.primaryNumber)
             val result = when (state.operation) {
-                CalculatorOperation.Add -> a.add(b)
-                CalculatorOperation.Subtract -> a.subtract(b)
-                CalculatorOperation.Multiply -> a.multiply(b)
+                CalculatorOperation.Add -> a.add(b, MathContext.DECIMAL128)
+                CalculatorOperation.Subtract -> a.subtract(b, MathContext.DECIMAL128)
+                CalculatorOperation.Multiply -> a.multiply(b, MathContext.DECIMAL128)
                 CalculatorOperation.Divide -> {
                     if (b.compareTo(BigDecimal.ZERO) == 0) return state.copy(primaryNumber = ERROR)
-                    a.divide(b, MathContext(MAX_DIGITS, RoundingMode.HALF_UP))
+                    a.divide(b, MathContext.DECIMAL128)
                 }
                 CalculatorOperation.Percent -> {
                     if (b.compareTo(BigDecimal.ZERO) == 0) return state.copy(primaryNumber = ERROR)
-                    a.remainder(b)
+                    a.remainder(b, MathContext.DECIMAL128)
                 }
                 null -> return state
             }
@@ -118,11 +126,17 @@ object CalculatorEngine {
     }
 
     private fun format(value: BigDecimal): String {
+        if (value.compareTo(BigDecimal.ZERO) == 0) return "0"
         val stripped = value.stripTrailingZeros()
         return if (stripped.scale() <= 0) {
-            stripped.toBigIntegerExact().toString()
-        } else {
             stripped.toPlainString()
+        } else {
+            val formatted = stripped.toPlainString()
+            if (formatted.length > MAX_DIGITS + 1) {
+                stripped.round(MathContext(MAX_DIGITS)).stripTrailingZeros().toPlainString()
+            } else {
+                formatted
+            }
         }
     }
 }

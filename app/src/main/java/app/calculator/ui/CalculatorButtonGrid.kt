@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.calculator.domain.CalculatorAction
 import app.calculator.domain.CalculatorOperation
+import app.calculator.domain.CalculatorState
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.*
@@ -61,24 +62,33 @@ private val rows = listOf(
 @Composable
 fun CalculatorButtonGrid(
     onAction: (CalculatorAction) -> Unit,
+    state: CalculatorState,
     modifier: Modifier = Modifier
 ) {
+    val showClearEntry = state.primaryNumber.isNotEmpty()
+    val clearLabel = if (showClearEntry) "C" else "AC"
+    val clearAction = if (showClearEntry) CalculatorAction.ClearEntry else CalculatorAction.Clear
+
     Column(
-        modifier = modifier.padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = modifier.padding(horizontal = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         rows.forEach { row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 row.forEach { button ->
+                    val isClear = button.style == ButtonStyle.Action && (button.symbol == "AC" || button.symbol == "C")
+                    val currentSymbol = if (isClear) clearLabel else button.symbol
+                    val currentAction = if (isClear) clearAction else button.action
+
                     CalculatorButton(
-                        symbol = button.symbol,
+                        symbol = currentSymbol,
                         style = button.style,
                         modifier = Modifier.weight(1f),
                         icon = button.icon,
-                        onClick = { onAction(button.action) }
+                        onClick = { onAction(currentAction) }
                     )
                 }
             }
