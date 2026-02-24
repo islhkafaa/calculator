@@ -1,4 +1,4 @@
-# Expressive Calculator
+# Calculator
 
 A premium Android calculator application built with **Jetpack Compose** and **Material 3 Expressive** design guidelines.
 
